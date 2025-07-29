@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GT Modding Servers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #4c1d95, #7e22ce);
+      overflow: hidden;
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+    }
+    .code-snippet {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.2);
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      white-space: pre;
+      pointer-events: none;
+      animation: scroll 20s linear infinite;
+    }
+    @keyframes scroll {
+      0% { transform: translateY(100vh); }
+      100% { transform: translateY(-100vh); }
+    }
+    .code-snippet:nth-child(2) { left: 10%; animation-duration: 25s; }
+    .code-snippet:nth-child(3) { left: 30%; animation-duration: 18s; }
+    .code-snippet:nth-child(4) { left: 50%; animation-duration: 22s; }
+    .code-snippet:nth-child(5) { left: 70%; animation-duration: 20s; }
+    .download-btn {
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+    }
+    .download-btn:hover {
+      transform: scale(1.1);
+      background-color: #a855f7;
+    }
+    h1 {
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen text-white">
+  <div class="code-snippet">
+Currently listening to:https://open.spotify.com/track/7u5klHTC3YularUCNed5o5?si=86d04161aa804274
+  </div>
+  <div class="code-snippet">
+    private void OnJoinedRoom()
+    {
+        if (PhotonNetwork.CurrentRoom.Name.Contains("@"))
+        {
+            string roomName = PhotonNetwork.CurrentRoom.Name.Replace("@", "");
+            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.JoinRoom(roomName);
+        }
+    }
+  </div>
+  <div class="code-snippet">
+    [HarmonyPatch(typeof(GorillaComputer), "StartupScreen")]
+    internal class ScreenTextPatch
+    {
+        private static bool Prefix()
+        {
+            FieldInfo field = typeof(GorillaComputer).GetField("screenText", BindingFlags.Instance | BindingFlags.Public);
+            if (field != null)
+            {
+                GorillaComputer instance = GorillaComputer.instance;
+                object value = field.GetValue(instance);
+                PropertyInfo property = value.GetType().GetProperty("Text");
+                if (property != null)
+                {
+                    property.SetValue(value, string.Concat("DAVUKS OS\n\n", "", PhotonNetwork.CountOfPlayersOnMaster + " PLAYERS ONLINE \n\n", "", "PRESS ANY KEY TO BEGIN"));
+                }
+            }
+            return false;
+        }
+    }
+  </div>
+  <div class="code-snippet">
+    [HarmonyPatch(typeof(GorillaComputer), "CheckAutoBanListForRoomName")]
+    internal class JoinPatch
+    {
+        private static bool Prefix()
+        {
+            PhotonNetworkController.Instance.AttemptToJoinSpecificRoom(GorillaComputer.instance.roomToJoin, FriendshipGroupDetection.Instance.IsInParty ? JoinType.ForceJoinWithParty : JoinType.Solo);
+            return false;
+        }
+    }
+  </div>
+
+  <h1 class="text-5xl font-bold mb-10 drop-shadow-lg">GT Modding Servers</h1>
+  <a href="https://data.dmenu.me/DavukssModdingServers.dll" class="download-btn bg-purple-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg text-center">
+    Download
+  </a>
+</body>
+</html>
